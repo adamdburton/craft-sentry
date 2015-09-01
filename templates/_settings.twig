@@ -1,0 +1,20 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+    first:        true,
+    label:        "DSN"|t,
+    id:           'dsn',
+    name:         'dsn',
+    instructions: "Sentry project DSN (aka Client Key)."|t,
+    value:        settings.dsn,
+    autofocus:    true,
+    errors:       settings.getErrors('dsn')
+}) }}
+
+{{ forms.lightswitchField({
+	label:        "Report in devMode?"|t,
+	id:           'reportInDevMode',
+	name:         'reportInDevMode',
+	on:           settings.reportInDevMode,
+	errors:       settings.getErrors('reportInDevMode')
+}) }}
