@@ -34,13 +34,13 @@ class SentryVariable
     }
 
     /**
-     * Returns Client Access Token.
+     * Returns Sentry DSN.
      *
      * @return string
      */
-    public function clientAccessToken()
+    public function dsn()
     {
-        return $this->_settings->getAttribute('clientAccessToken');
+        return $this->_settings->getAttribute('dsn');
     }
 
     /**
