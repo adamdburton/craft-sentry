@@ -67,6 +67,8 @@ class SentryPlugin extends BasePlugin
     {
         return array(
             'dsn' => AttributeType::String,
+            'publicDsn' => AttributeType::String,
+            'reportJsErrors' => array( 'default' => false, 'type' => AttributeType::Bool),
             'reportInDevMode' => AttributeType::Bool
         );
     }
@@ -96,6 +98,21 @@ class SentryPlugin extends BasePlugin
             return;
         }
 
+        $this->configureBackendSentry();
+
+        $this->configureFrontendSentry();
+    }
+
+    /**
+     * Hook into the errors and exceptions for the server
+     * side if we should be
+     * @return $this;
+     */
+    protected function configureBackendSentry()
+    {
+        // Get plugin settings
+        $settings = $this->getSettings();
+
         // Require Sentry vendor code
         require_once CRAFT_PLUGINS_PATH.'sentry/vendor/autoload.php';
 
@@ -112,5 +129,50 @@ class SentryPlugin extends BasePlugin
         craft()->onError = function ($event) use ($client) {
             $client->captureMessage($event->message);
         };
+
+        return $this;
     }
+
+
+    /**
+     * Includes the JS for front-end sentry.
+     * @return $this
+     */
+    protected function configureFrontendSentry()
+    {
+        // Get plugin settings
+        $settings = $this->getSettings();
+
+        if (!$this->isWebRequest()) {
+            return $this;
+        }
+
+        if (!$settings->reportJsErrors) {
+            return $this;
+        }
+
+        craft()->templates->includeJsFile('https://cdn.ravenjs.com/1.1.22/jquery,native/raven.min.js');
+
+        $publicDsn = $settings->publicDsn;
+        if (empty($publicDsn)) {
+            return $this;
+        }
+
+        craft()->templates->includeJs("Raven.config('{$publicDsn}').install()");
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @return boolean true if this is a web control panel request and the user is currently logged in.
+     */
+    protected function isWebRequest()
+    {
+        if (craft()->isConsole()){
+            return false;
+        }
+        return true;
+    }
+
 }
