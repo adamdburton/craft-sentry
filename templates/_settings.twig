@@ -11,8 +11,28 @@
     errors:       settings.getErrors('dsn')
 }) }}
 
+{{ forms.textField({
+    label:        "Public DSN"|t,
+    id:           'publicDsn',
+    name:         'publicDsn',
+    instructions: "You need a public DSN if you plan on reporting client-side javascript errors. You can get your public DSN by logging-into Sentry and going to th integrations page."|t,
+    value:        settings.publicDsn,
+    errors:       settings.getErrors('publicDsn')
+}) }}
+
+{{ forms.lightswitchField({
+    label:        "Enable Javascript Error Reporting?"|t,
+    instructions: "If enabled, the plugin will report javascript errors. You must have a public DSN specified for this to work."|t,
+    id:           'reportJsErrors',
+    name:         'reportJsErrors',
+    on:           settings.reportJsErrors,
+    errors:       settings.getErrors('reportJsErrors')
+}) }}
+
+
 {{ forms.lightswitchField({
 	label:        "Report in devMode?"|t,
+    instructions: "If enabled, the plugin will send events to the Sentry server even though the config devMode option is enabled (usually enabled for developer environments)."|t,
 	id:           'reportInDevMode',
 	name:         'reportInDevMode',
 	on:           settings.reportInDevMode,
