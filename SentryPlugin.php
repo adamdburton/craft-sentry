@@ -69,6 +69,7 @@ class SentryPlugin extends BasePlugin
             'dsn' => AttributeType::String,
             'publicDsn' => AttributeType::String,
             'reportJsErrors' => array( 'default' => false, 'type' => AttributeType::Bool),
+            'jsRegexFilter' => array( 'default' => '',  AttributeType::String),
             'reportInDevMode' => AttributeType::Bool
         );
     }
@@ -90,17 +91,24 @@ class SentryPlugin extends BasePlugin
      */
     public function init()
     {
-        // Get plugin settings
-        $settings = $this->getSettings();
+        try {
+            // Get plugin settings
+            $settings = $this->getSettings();
 
-        // See if we have to report in devMode
-        if (!$settings->reportInDevMode && craft()->config->get('devMode')) {
-            return;
+            // See if we have to report in devMode
+            if (craft()->config->get('devMode')) {
+                if (!$settings->reportInDevMode) {
+                    return;
+                }
+            }
+
+            $this->configureBackendSentry();
+
+            $this->configureFrontendSentry();
+
+        } catch (Exception $e) {
+            Craft::log("ERROR: The craft sentry plugin encountered an error wheil trying to initialize: {$e}", LogLevel::Error);
         }
-
-        $this->configureBackendSentry();
-
-        $this->configureFrontendSentry();
     }
 
     /**
@@ -120,6 +128,18 @@ class SentryPlugin extends BasePlugin
         $client = new Raven_Client($settings->dsn);
         $client->tags_context(array('environment' => CRAFT_ENVIRONMENT));
 
+        $this->attachRavenErrorHandlers($client);
+
+        return $this;
+    }
+
+    /**
+     * Attaches the error and exception handlers
+     * for Sentry using the given client.
+     * @param  Raven_Client $client   Client to send the exceptions/messages to.
+     */
+    protected function attachRavenErrorHandlers(Raven_Client $client)
+    {        
         // Log Craft Exceptions to Sentry
         craft()->onException = function ($event) use ($client) {
             $client->captureException($event->exception);
@@ -132,7 +152,6 @@ class SentryPlugin extends BasePlugin
 
         return $this;
     }
-
 
     /**
      * Includes the JS for front-end sentry.
@@ -151,6 +170,10 @@ class SentryPlugin extends BasePlugin
             return $this;
         }
 
+        if (!$this->matchesJsFilter()) {
+            return $this;
+        }
+
         craft()->templates->includeJsFile('https://cdn.ravenjs.com/1.1.22/jquery,native/raven.min.js');
 
         $publicDsn = $settings->publicDsn;
@@ -161,6 +184,35 @@ class SentryPlugin extends BasePlugin
         craft()->templates->includeJs("Raven.config('{$publicDsn}').install()");
 
         return $this;
+    }
+
+    /**
+     * Checks to see if we should be including the Raven JS
+     * based on the request URI filter (if specified)
+     * @return boolean  True if we should include the JS, false otherwise.
+     */
+    protected function matchesJsFilter()
+    {
+        // Get plugin settings
+        $settings = $this->getSettings();
+
+        // If no filter specified, show JS on every page.
+        if (empty($settings->jsRegexFilter)) {
+            return true;
+        }
+        $uri = craft()->request->getRequestUri();
+
+        $filter = $settings->jsRegexFilter;
+
+        // Match using Regex
+        $matchResult = @preg_match($filter, $uri);
+            
+        if ($matchResult === false) {
+            // Filter is not valid regex, so match using a simple filter.
+            return stripos($uri, $filter) !== false;
+        }
+
+        return $matchResult === 1;
     }
 
     /**
