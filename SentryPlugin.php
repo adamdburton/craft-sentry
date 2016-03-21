@@ -35,7 +35,7 @@ class SentryPlugin extends BasePlugin
      */
     public function getVersion()
     {
-        return '1.0.0';
+        return '1.1.0';
     }
 
     /**
@@ -69,6 +69,7 @@ class SentryPlugin extends BasePlugin
             'dsn' => AttributeType::String,
             'publicDsn' => AttributeType::String,
             'reportJsErrors' => array( 'default' => false, 'type' => AttributeType::Bool),
+            'ignoredErrorCodes' => array( 'default' => '', 'type' => AttributeType::String),
             'jsRegexFilter' => array( 'default' => '',  AttributeType::String),
             'reportInDevMode' => AttributeType::Bool
         );
@@ -142,7 +143,9 @@ class SentryPlugin extends BasePlugin
     {        
         // Log Craft Exceptions to Sentry
         craft()->onException = function ($event) use ($client) {
-            $client->captureException($event->exception);
+            if (!$this->shouldIgnoreException($event->exception)) {
+                $client->captureException($event->exception);
+            }
         };
 
         // Log Craft Errors to Sentry
@@ -151,6 +154,25 @@ class SentryPlugin extends BasePlugin
         };
 
         return $this;
+    }
+
+    /**
+     * Checks to see if the given HTTP exception should not be sent to Sentry 
+     * For example, we may not want to send 404s to sentry.
+     * @param  \CHttpException $exception 
+     * @return boolean True if we should ignore the xception and not send it to Sentry
+     */
+    protected function shouldIgnoreException($exception)
+    {
+        if ($exception instanceof \CHttpException) {
+            $ignoredCodes = explode(',', $this->getSettings()->ignoredErrorCodes);
+            foreach ($ignoredCodes as $ignoredCode) {
+                if ($exception->statusCode == intval($ignoredCode)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

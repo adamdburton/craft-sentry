@@ -47,3 +47,12 @@
 	on:           settings.reportInDevMode,
 	errors:       settings.getErrors('reportInDevMode')
 }) }}
+
+{{ forms.textField({
+    label:        "Ignore These HTTP Error Codes"|t,
+    instructions: "Enter a comma separated list of HTTP error codes that should NOT be sent to sentry if encountered (default: report all errors)"|t,
+    id:           'ignoredErrorCodes',
+    name:         'ignoredErrorCodes',
+    value:        settings.ignoredErrorCodes,
+    errors:       settings.getErrors('ignoredErrorCodes')
+}) }}
