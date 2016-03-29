@@ -126,7 +126,7 @@ class SentryPlugin extends BasePlugin
         require_once CRAFT_PLUGINS_PATH.'sentry/vendor/autoload.php';
 
         // Initialize Sentry
-        $client = new Raven_Client(craft()->sentry->dsn);
+        $client = new Raven_Client($settings->dsn);
         $client->tags_context(array('environment' => CRAFT_ENVIRONMENT));
 
         $this->attachRavenErrorHandlers($client);
@@ -198,7 +198,7 @@ class SentryPlugin extends BasePlugin
 
         craft()->templates->includeJsFile('https://cdn.ravenjs.com/1.1.22/jquery,native/raven.min.js');
 
-        $publicDsn = craft()->sentry->publicDsn;
+        $publicDsn = $settings->publicDsn;
         if (empty($publicDsn)) {
             return $this;
         }
