@@ -44,13 +44,23 @@
 }) }}
 
 {{ forms.textField({
-    label:        "Javascript Error Reporting Page Filter"|t,
+    label:        "Javascript Error Reporting Page Inclusion Filter"|t,
     instructions: "If javascript error reporting is enabled, this will act as a case-insensitive filter to only load the JS
     reporting (raven-js) on pages that match this expression. If the filter is a valid perl-style regular expression then it will be used as such."|t,
-    id:           'jsRegexFilter',
-    name:         'jsRegexFilter',
-    value:        settings.jsRegexFilter,
-    errors:       settings.getErrors('jsRegexFilter')
+    id:           'jsInclusionRegexFilter',
+    name:         'jsInclusionRegexFilter',
+    value:        settings.jsInclusionRegexFilter,
+    errors:       settings.getErrors('jsInclusionRegexFilter')
+}) }}
+
+{{ forms.textField({
+    label:        "Javascript Error Reporting Page Exclusion Filter"|t,
+    instructions: "If javascript error reporting is enabled, this will act as a case-insensitive filter to only exclue the JS
+    reporting (raven-js) from pages that match this expression. If the filter is a valid perl-style regular expression then it will be used as such."|t,
+    id:           'jsExclusionRegexFilter',
+    name:         'jsExclusionRegexFilter',
+    value:        settings.jsExclusionRegexFilter,
+    errors:       settings.getErrors('jsExclusionRegexFilter')
 }) }}
 
 {{ forms.lightswitchField({

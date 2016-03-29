@@ -70,7 +70,8 @@ class SentryPlugin extends BasePlugin
             'publicDsn' => AttributeType::String,
             'reportJsErrors' => array( 'default' => false, 'type' => AttributeType::Bool),
             'ignoredErrorCodes' => array( 'default' => '', 'type' => AttributeType::String),
-            'jsRegexFilter' => array( 'default' => '',  AttributeType::String),
+            'jsInclusionRegexFilter' => array( 'default' => '',  AttributeType::String),
+            'jsExclusionRegexFilter' => array( 'default' => '',  AttributeType::String),
             'reportInDevMode' => AttributeType::Bool
         );
     }
@@ -192,7 +193,7 @@ class SentryPlugin extends BasePlugin
             return $this;
         }
 
-        if (!$this->matchesJsFilter()) {
+        if (!$this->matchesJsInclusionFilter() || $this->matchesJsExclusionFilter()) {
             return $this;
         }
 
@@ -213,32 +214,39 @@ class SentryPlugin extends BasePlugin
      * based on the request URI filter (if specified)
      * @return boolean  True if we should include the JS, false otherwise.
      */
-    protected function matchesJsFilter()
+    protected function matchesJsInclusionFilter()
     {
         // Get plugin settings
         $settings = $this->getSettings();
 
         // If no filter specified, show JS on every page.
-        if (empty($settings->jsRegexFilter)) {
+        if (empty($settings->jsInclusionRegexFilter)) {
             return true;
         }
-        $uri = craft()->request->getRequestUri();
 
-        $filter = $settings->jsRegexFilter;
-
-        // Match using Regex
-        $matchResult = @preg_match($filter, $uri);
-            
-        if ($matchResult === false) {
-            // Filter is not valid regex, so match using a simple filter.
-            return stripos($uri, $filter) !== false;
-        }
-
-        return $matchResult === 1;
+        return $this->matchesFilter($settings->jsInclusionRegexFilter);
     }
 
     /**
-     * 
+     * Checks to see if we should be excluding the Raven JS
+     * based on the request URI filter (if specified)
+     * @return boolean  True if we should exclude the JS, false otherwise.
+     */
+    protected function matchesJsExclusionFilter()
+    {
+        // Get plugin settings
+        $settings = $this->getSettings();
+
+        // If no filter specified, show JS on every page.
+        if (empty($settings->jsExclusionRegexFilter)) {
+            return false;
+        }
+
+        return $this->matchesFilter($settings->jsExclusionRegexFilter);
+    }
+
+    /**
+     *
      * @return boolean true if this is a web control panel request and the user is currently logged in.
      */
     protected function isWebRequest()
@@ -247,6 +255,25 @@ class SentryPlugin extends BasePlugin
             return false;
         }
         return true;
+    }
+
+    /**
+     *
+     * @return boolean true if the current URI matches the provided filter, false otherwise.
+     */
+    protected function matchesFilter($filter)
+    {
+      $uri = craft()->request->getRequestUri();
+
+      // Match using Regex
+      $matchResult = @preg_match($filter, $uri);
+
+      if ($matchResult === false) {
+          // Filter is not valid regex, so match using a simple filter.
+          return stripos($uri, $filter) !== false;
+      }
+
+      return $matchResult === 1;
     }
 
 }
