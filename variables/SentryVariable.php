@@ -40,10 +40,7 @@ class SentryVariable
      */
     public function dsn()
     {
-        if ($dsn = craft()->config->get('sentryDsn', 'sentry')) {
-            return $dsn;
-        }
-        return $this->_settings->getAttribute('dsn');
+        return craft()->sentry->dns();
     }
 
     /**
@@ -52,7 +49,7 @@ class SentryVariable
      */
     public function isDsnSpecifiedByEnv()
     {
-        return craft()->config->get('sentryDsn', 'sentry') ? true : false;
+        return craft()->sentry->isDsnSpecifiedByEnv();
     }
 
     /**
@@ -62,10 +59,7 @@ class SentryVariable
      */
     public function publicDsn()
     {
-        if ($publicDsn = craft()->config->get('sentryPublicDsn', 'sentry')) {
-            return $publicDsn;
-        }
-        return $this->_settings->getAttribute('publicDsn');
+        return craft()->sentry->publicDsn();
     }
     
     /**
@@ -74,7 +68,7 @@ class SentryVariable
      */
     public function isPublicDsnSpecifiedByEnv()
     {
-        return craft()->config->get('sentryPublicDsn', 'sentry') ? true : false;
+        return craft()->sentry->isPublicDsnSpecifiedByEnv();
     }
 
     /**
