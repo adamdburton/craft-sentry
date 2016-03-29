@@ -1,24 +1,38 @@
 {% import "_includes/forms" as forms %}
 
-{{ forms.textField({
-    first:        true,
-    label:        "DSN"|t,
-    id:           'dsn',
-    name:         'dsn',
-    instructions: "Sentry project DSN (aka Client Key)."|t,
-    value:        settings.dsn,
-    autofocus:    true,
-    errors:       settings.getErrors('dsn')
-}) }}
+<style> .sentry-settings-notice { font-style: italic; margin-bottom: 12px; } </style>
 
-{{ forms.textField({
-    label:        "Public DSN"|t,
-    id:           'publicDsn',
-    name:         'publicDsn',
-    instructions: "You need a public DSN if you plan on reporting client-side javascript errors. You can get your public DSN by logging-into Sentry and going to th integrations page."|t,
-    value:        settings.publicDsn,
-    errors:       settings.getErrors('publicDsn')
-}) }}
+{% if craft.sentry.isDsnSpecifiedByEnv %}
+    <div class="sentry-settings-notice">
+        {{ "Your DSN is specified by your environment. Please ask your server administrator to configure the value if you need to change it."|t}}
+    </div>
+{% else %}
+    {{ forms.textField({
+        first:        true,
+        label:        "DSN"|t,
+        id:           'dsn',
+        name:         'dsn',
+        instructions: "Sentry project DSN (aka Client Key). NOTE: This is overriden by your environment's SENTRY_DSN value if it is specified."|t,
+        value:        settings.dsn,
+        autofocus:    true,
+        errors:       settings.getErrors('dsn')
+    }) }}
+{% endif %}
+
+{% if craft.sentry.isPublicDsnSpecifiedByEnv %}
+    <div class="sentry-settings-notice">
+        {{ "Your public DSN is specified by your environment. Please ask your server administrator to configure the value if you need to change it."|t}}
+    </div>
+{% else %}
+    {{ forms.textField({
+        label:        "Public DSN"|t,
+        id:           'publicDsn',
+        name:         'publicDsn',
+        instructions: "You need a public DSN if you plan on reporting client-side javascript errors. You can get your public DSN by logging-into Sentry and going to th integrations page. NOTE: This is overriden by your environment's SENTRY_PUBLIC_DSN value if it is specified."|t,
+        value:        settings.publicDsn,
+        errors:       settings.getErrors('publicDsn')
+    }) }}
+{% endif %}
 
 {{ forms.lightswitchField({
     label:        "Enable Javascript Error Reporting?"|t,
