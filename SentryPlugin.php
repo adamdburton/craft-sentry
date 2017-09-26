@@ -140,7 +140,7 @@ class SentryPlugin extends BasePlugin
      * @param  Raven_Client $client   Client to send the exceptions/messages to.
      */
     protected function attachRavenErrorHandlers(Raven_Client $client)
-    {        
+    {
         // Log Craft Exceptions to Sentry
         craft()->onException = function ($event) use ($client) {
             if (!$this->shouldIgnoreException($event->exception)) {
@@ -157,12 +157,13 @@ class SentryPlugin extends BasePlugin
     }
 
     /**
-     * Checks to see if the given HTTP exception should not be sent to Sentry 
+     * Checks to see if the given HTTP exception should not be sent to Sentry
      * For example, we may not want to send 404s to sentry.
-     * @param  \CHttpException $exception 
+     * @param  \CHttpException $exception
+     * @param  boolean         $isPrevious
      * @return boolean True if we should ignore the xception and not send it to Sentry
      */
-    protected function shouldIgnoreException($exception)
+    protected function shouldIgnoreException($exception, $isPrevious = false)
     {
         if ($exception instanceof \CHttpException) {
             $ignoredCodes = explode(',', $this->getSettings()->ignoredErrorCodes);
@@ -171,6 +172,8 @@ class SentryPlugin extends BasePlugin
                     return true;
                 }
             }
+        } elseif (!$isPrevious) {
+            return $this->shouldIgnoreException($exception->getPrevious(), true);
         }
         return false;
     }
@@ -228,7 +231,7 @@ class SentryPlugin extends BasePlugin
 
         // Match using Regex
         $matchResult = @preg_match($filter, $uri);
-            
+
         if ($matchResult === false) {
             // Filter is not valid regex, so match using a simple filter.
             return stripos($uri, $filter) !== false;
@@ -238,7 +241,7 @@ class SentryPlugin extends BasePlugin
     }
 
     /**
-     * 
+     *
      * @return boolean true if this is a web control panel request and the user is currently logged in.
      */
     protected function isWebRequest()
