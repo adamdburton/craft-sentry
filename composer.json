@@ -2,14 +2,14 @@
     "name": "boboldehampsink/rollbar",
     "description": "Rollbar Plugin for Craft CMS",
     "authors": [
-		{
-			"name": "Bob Olde Hampsink",
-			"email": "b.oldehampsink@itmundi.nl"
-		}
-	],
+    {
+      "name": "Bob Olde Hampsink",
+      "email": "b.oldehampsink@itmundi.nl"
+    }
+  ],
     "type": "craft-plugin",
     "require": {
-        "composer/installers": "~1.0",
-        "sentry/sentry": "~1.6.2"
+        "composer/installers": "~1.4.0",
+        "sentry/sentry": "~1.7.1"
     }
 }
