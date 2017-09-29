@@ -27,6 +27,10 @@ The plugin's folder should be named "sentry"
 
 Changelog
 =================
+### 1.1.3
+- Updated Sentry to 1.7.1 and Composer Installers to 1.4.0
+### 1.1.2
+- Replaced old Raven 0.12.1 with new Sentry 1.6.2
 ### 1.1.1
 - Added ability to load DSN/publicDSN from .env
 ### 1.1
