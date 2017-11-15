@@ -1,12 +1,15 @@
 {
-    "name": "boboldehampsink/rollbar",
+    "name": "adamdburton/craft-sentry",
     "description": "Rollbar Plugin for Craft CMS",
     "authors": [
-		{
-			"name": "Bob Olde Hampsink",
-			"email": "b.oldehampsink@itmundi.nl"
-		}
-	],
+        {
+            "name": "Adam Burton"
+        },
+        {
+            "name": "Bob Olde Hampsink",
+            "email": "b.oldehampsink@itmundi.nl"
+        }
+    ],
     "type": "craft-plugin",
     "require": {
         "composer/installers": "~1.0",
