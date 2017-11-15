@@ -196,7 +196,7 @@ class SentryPlugin extends BasePlugin
             return $this;
         }
 
-        craft()->templates->includeJsFile('https://cdn.ravenjs.com/1.1.22/jquery,native/raven.min.js');
+        craft()->templates->includeJsFile('https://cdn.ravenjs.com/3.20.0/raven.min.js');
 
         $publicDsn = craft()->sentry->publicDsn();
         if (empty($publicDsn)) {
