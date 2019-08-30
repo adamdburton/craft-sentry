@@ -2,7 +2,7 @@
 
 namespace Craft;
 
-use Raven_Client;
+use Sentry;
 
 /**
  * Sentry Plugin.
@@ -126,8 +126,10 @@ class SentryPlugin extends BasePlugin
         require_once CRAFT_PLUGINS_PATH.'sentry/vendor/autoload.php';
 
         // Initialize Sentry
-        $client = new Raven_Client(craft()->sentry->dsn());
-        $client->tags_context(array('environment' => CRAFT_ENVIRONMENT));
+        Sentry\init([
+            'dsn' => craft()->sentry->dsn(),
+            'environment' => CRAFT_ENVIRONMENT,
+        ]);
 
         $this->attachRavenErrorHandlers($client);
 
@@ -144,13 +146,13 @@ class SentryPlugin extends BasePlugin
         // Log Craft Exceptions to Sentry
         craft()->onException = function ($event) use ($client) {
             if (!$this->shouldIgnoreException($event->exception)) {
-                $client->captureException($event->exception);
+                Sentry\captureException($event->exception);
             }
         };
 
         // Log Craft Errors to Sentry
         craft()->onError = function ($event) use ($client) {
-            $client->captureMessage($event->message);
+            Sentry\captureMessage($event->message);
         };
 
         return $this;
@@ -196,14 +198,14 @@ class SentryPlugin extends BasePlugin
             return $this;
         }
 
-        craft()->templates->includeJsFile('https://cdn.ravenjs.com/3.24.0/raven.min.js');
+        craft()->templates->includeJsFile('https://browser.sentry-cdn.com/5.6.3/bundle.min.js');
 
         $publicDsn = craft()->sentry->publicDsn();
         if (empty($publicDsn)) {
             return $this;
         }
 
-        craft()->templates->includeJs("Raven.config('{$publicDsn}').install()");
+        craft()->templates->includeJs("Sentry.init({ dsn: '{$publicDsn}' });");
 
         return $this;
     }
