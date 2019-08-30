@@ -131,7 +131,7 @@ class SentryPlugin extends BasePlugin
             'environment' => CRAFT_ENVIRONMENT,
         ]);
 
-        $this->attachRavenErrorHandlers($client);
+        $this->attachRavenErrorHandlers();
 
         return $this;
     }
@@ -139,19 +139,18 @@ class SentryPlugin extends BasePlugin
     /**
      * Attaches the error and exception handlers
      * for Sentry using the given client.
-     * @param  Raven_Client $client   Client to send the exceptions/messages to.
      */
-    protected function attachRavenErrorHandlers(Raven_Client $client)
+    protected function attachRavenErrorHandlers()
     {        
         // Log Craft Exceptions to Sentry
-        craft()->onException = function ($event) use ($client) {
+        craft()->onException = function ($event) {
             if (!$this->shouldIgnoreException($event->exception)) {
                 Sentry\captureException($event->exception);
             }
         };
 
         // Log Craft Errors to Sentry
-        craft()->onError = function ($event) use ($client) {
+        craft()->onError = function ($event) {
             Sentry\captureMessage($event->message);
         };
 
