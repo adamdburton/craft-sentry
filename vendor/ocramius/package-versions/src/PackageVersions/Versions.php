@@ -34,11 +34,11 @@ final class Versions
   'ralouphie/getallheaders' => '3.0.3@120b605dfeb996808c31b6477290a714d356e822',
   'ramsey/uuid' => '3.8.0@d09ea80159c1929d75b3f9c60504d613aeb4a1e3',
   'sentry/sdk' => '2.0.3@91c36aec83e4c1c5801b64ef4927b78a5aa8ce7f',
-  'sentry/sentry' => '2.1.2@646f6ada8b89a08063e31f54ed6d260bd6879239',
+  'sentry/sentry' => '2.1.3@41ef3b66c2a06e3510d6e128eec28acac388f770',
   'symfony/options-resolver' => 'v4.3.4@81c2e120522a42f623233968244baebd6b36cb6a',
   'symfony/polyfill-ctype' => 'v1.12.0@550ebaac289296ce228a706d0867afc34687e3f4',
   'zendframework/zend-diactoros' => '2.1.3@279723778c40164bcf984a2df12ff2c6ec5e61c1',
-  'adamdburton/craft-sentry' => 'dev-master@eaca0f5835b82ac0c5e22de430c87c392d133eff',
+  'adamdburton/craft-sentry' => 'dev-master@c4dd32220d29828cff673a8ba9b7c3c607e2f309',
 );
 
     private function __construct()
